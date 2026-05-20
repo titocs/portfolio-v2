@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Home, User, Code, BookOpen, Terminal, Mail } from 'lucide-react'
+import { Home, User, Code, BookOpen, Terminal, Library } from 'lucide-react'
 import Link from 'next/link'
 import { useTerminal } from '@/context/TerminalContext'
 
@@ -12,7 +12,7 @@ const Navbar = () => {
     { icon: <User size={24} />, label: 'About', href: '/about' }, 
     { icon: <Code size={24} />, label: 'Projects', href: '/#projects' },
     { icon: <BookOpen size={24} />, label: 'Blog', href: '/blog' },
-    { icon: <Mail size={24} />, label: 'Contact', href: '#contact' },
+    { icon: <Library size={24} />, label: 'My Notes', href: '/notes' },
   ]
 
   // IMPORTANT: Next.js Link with hash works, but smooth scrolling needs CSS: scroll-behavior: smooth in html/body.

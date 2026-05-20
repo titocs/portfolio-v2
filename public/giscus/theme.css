@@ -1,0 +1,60 @@
+/*! Custom Giscus Theme for SYSTEM_LOGS */
+
+main {
+  --color-canvas-default: #050505;
+  --color-canvas-overlay: #111111;
+  --color-canvas-inset: #000000;
+
+  --color-border-default: rgba(255, 255, 255, 0.1);
+  --color-border-muted: rgba(255, 255, 255, 0.05);
+
+  --color-neutral-muted: rgba(16, 185, 129, 0.2); /* Bio green with opacity */
+
+  --color-accent-fg: #10b981; /* Bio Green */
+  --color-accent-emphasis: #10b981;
+  --color-accent-muted: rgba(16, 185, 129, 0.4);
+  --color-accent-subtle: rgba(16, 185, 129, 0.1);
+
+  --color-danger-fg: #ef4444; /* Error red */
+
+  --color-fg-default: #e5e5e5;
+  --color-fg-muted: #9ca3af; /* Gray 400 */
+  --color-fg-subtle: #6b7280; /* Gray 500 */
+
+  --color-btn-text: #ffffff;
+  --color-btn-bg: #111111;
+  --color-btn-border: rgba(255, 255, 255, 0.1);
+  --color-btn-hover-bg: #222222;
+  --color-btn-hover-border: #10b981;
+
+  --color-btn-primary-text: #000000;
+  --color-btn-primary-bg: #10b981;
+  --color-btn-primary-border: #10b981;
+  --color-btn-primary-hover-bg: #059669;
+
+  --fontStack-sansSerif:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+  --fontStack-monospace:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+    Liberation Mono, monospace;
+}
+
+/* Customizing specific elements for the hacker aesthetic */
+.gsc-header {
+  border-bottom: 1px solid var(--color-border-default);
+  padding-bottom: 1rem;
+}
+
+.gsc-comment-header {
+  font-family: var(--fontStack-monospace);
+}
+
+.gsc-comment-box-buttons button {
+  border-radius: 4px;
+}
+
+.gsc-comment-box-tabs .gsc-tab-active {
+  color: var(--color-accent-fg);
+  border-bottom: 2px solid var(--color-accent-fg);
+}

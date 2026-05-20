@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import ViewCounter from '@/components/ViewCounter'
 import GiscusComments from '@/components/GiscusComments'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, Clock } from 'lucide-react'
 
 // Generate static params for all our dummy posts
@@ -49,6 +50,22 @@ export default async function BlogPost(props: BlogPostProps) {
           <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white leading-tight">
             {post.title}
           </h1>
+
+          <div className="flex items-center gap-4 mb-8">
+            <div className="relative w-12 h-12 overflow-hidden rounded-full border-2 border-bio-green">
+              <Image
+                src="/images/profile-foto.webp"
+                alt="Tito Candraseptio"
+                fill
+                className="object-cover"
+                sizes="48px"
+              />
+            </div>
+            <div>
+              <p className="text-white font-medium text-lg">Tito Candra Septio</p>
+              <p className="text-gray-400 text-sm font-mono">Author</p>
+            </div>
+          </div>
           
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 font-mono pb-8 border-b border-white/10">
             <span>{post.date}</span>

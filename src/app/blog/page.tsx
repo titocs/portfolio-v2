@@ -1,18 +1,19 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import FeaturedArticle from "@/components/blog/FeaturedArticle";
 import ArticleCard from "@/components/blog/ArticleCard";
-import BlogPagination from "@/components/blog/BlogPagination";
 import { blogPosts, getAllCategories } from "@/lib/blogData";
 
-const ITEMS_PER_PAGE = 7; // Changed to 7 items per page as requested
+const INITIAL_ITEMS = 6;
+const ITEMS_PER_LOAD = 6;
 
 export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [visibleItemsCount, setVisibleItemsCount] = useState(INITIAL_ITEMS);
 
   const categories = useMemo(() => getAllCategories(), []);
 
@@ -35,9 +36,8 @@ export default function BlogPage() {
 
   // Separate Featured Post
   const featuredPost = useMemo(() => {
-    // Only show featured post if we are on the first page and no search query
-    // and looking at "All" or its specific category
-    if (searchQuery || currentPage !== 1) return null;
+    // Only show featured post if there is no search query
+    if (searchQuery) return null;
     
     const fp = filteredPosts.find((p) => p.featured);
     if (!fp) return null;
@@ -46,34 +46,38 @@ export default function BlogPage() {
     if (selectedCategory !== "All" && fp.category !== selectedCategory) return null;
 
     return fp;
-  }, [filteredPosts, searchQuery, currentPage, selectedCategory]);
+  }, [filteredPosts, searchQuery, selectedCategory]);
 
-  // Pagination Logic
-  const paginatedPosts = useMemo(() => {
+  // Visible Items Logic
+  const visiblePosts = useMemo(() => {
     // Exclude featured post from the grid if it's currently being shown at the top
     const postsForGrid = featuredPost
       ? filteredPosts.filter((p) => p.id !== featuredPost.id)
       : filteredPosts;
 
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return postsForGrid.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredPosts, currentPage, featuredPost]);
+    return postsForGrid.slice(0, visibleItemsCount);
+  }, [filteredPosts, visibleItemsCount, featuredPost]);
 
-  const totalPages = Math.ceil(
-    (featuredPost ? filteredPosts.length - 1 : filteredPosts.length) /
-      ITEMS_PER_PAGE
-  );
+  const totalPostsCount = featuredPost 
+    ? filteredPosts.length - 1 
+    : filteredPosts.length;
+  
+  const hasMorePosts = totalPostsCount > visibleItemsCount;
 
   // Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(1); // Reset to first page on search
+    setVisibleItemsCount(INITIAL_ITEMS); // Reset visible items on search
   };
 
   const handleCategoryChange = (cat: string) => {
     setSelectedCategory(cat);
     setSearchQuery(""); // Optionally clear search when changing categories
-    setCurrentPage(1);
+    setVisibleItemsCount(INITIAL_ITEMS);
+  };
+
+  const handleShowMore = () => {
+    setVisibleItemsCount((prev) => prev + ITEMS_PER_LOAD);
   };
 
   return (
@@ -141,7 +145,7 @@ export default function BlogPage() {
           )}
 
           {/* Empty State */}
-          {paginatedPosts.length === 0 && !featuredPost && (
+          {visiblePosts.length === 0 && !featuredPost && (
             <div className="text-center py-32 border border-white/5 rounded-xl bg-[#0a0a0a]">
               <p className="font-mono text-gray-500 text-lg">
                 &gt; No logs found matching criteria.
@@ -149,24 +153,43 @@ export default function BlogPage() {
             </div>
           )}
 
-          {/* Article Grid */}
-          {paginatedPosts.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedPosts.map((post) => (
-                <ArticleCard key={post.id} post={post} />
-              ))}
+          {/* Article Grid & Show More */}
+          {visiblePosts.length > 0 && (
+            <div className={`relative ${hasMorePosts ? 'pb-32' : ''}`}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {visiblePosts.map((post, index) => (
+                  <motion.div
+                    key={post.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: (index % ITEMS_PER_LOAD) * 0.15,
+                      ease: "easeOut"
+                    }}
+                  >
+                    <ArticleCard post={post} />
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Gradient Overlay & Show More Button */}
+              {hasMorePosts && (
+                <div className="absolute bottom-0 left-0 right-0 h-64 bg-linear-to-t from-void-black via-void-black/90 to-transparent flex items-end justify-center pb-4 pointer-events-none z-10">
+                  <button
+                    onClick={handleShowMore}
+                    className="pointer-events-auto px-8 py-3 bg-bio-green/10 text-bio-green border border-bio-green/30 hover:bg-bio-green hover:text-black font-semibold rounded-md font-mono transition-all duration-300 flex items-center justify-center space-x-2 w-full md:w-auto backdrop-blur-sm"
+                  >
+                    <span>Show More</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
-
-        {/* Pagination - Only show if there's more than 1 page */}
-        {totalPages > 1 && (
-          <BlogPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        )}
       </div>
     </main>
   );
